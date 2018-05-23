@@ -6,12 +6,14 @@ from enum import Enum, unique
 
 @unique
 class LANG_GET_TYPE(Enum):
+    "represents the types you can get the languages"
     DICT = 0
     ARRAY = 1
     JSON_ALL = 2
 
 @unique
 class FORMAT(Enum):
+    "represents the format you want to get the text"
     PLAIN_TEXT = 0
     HTML = 1
 
@@ -26,7 +28,6 @@ class Translator:
         :param apikey:
             you need an API-key from
             translate.yandex.com/developers
-
         :param ui:
             a language code your usierinterface should be
             for supported languages go to
@@ -37,10 +38,23 @@ class Translator:
 
     def get_supported_languages(self, arraytype:  LANG_GET_TYPE = LANG_GET_TYPE.JSON_ALL, ui: str = "en"):
         """
-
-        :param arraytype:
-        :param ui:
+        Gets the supported languages
+        :param arraytype: 
+            Describes which data will be returned
+        :param ui: 
+            In the response, supported languages are listed in the 
+            langs field with the definitions of the language codes. 
+            Language names are output in the language corresponding 
+            to the code in this parameter.
+            All the language codes are shown in the list of 
+            supported languages.
         :return:
+            if LANG_GET_TYPE.DICT:
+                returns supported languages as dictionary
+            elif LANG_GET_TYPE.ARRAY:
+                returns supported from-to translations as dictionary
+            elif LANG_GET_TYPE.JSON_ALL:
+                returns both as JSON-string
         """
         link = "https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=" + self.apikey + \
             "&ui="+ ui
@@ -68,9 +82,16 @@ class Translator:
         """
         Detects the language of a text
         :param text:
-        :param hint: example: "de,en,sw"
-        :param callback:
-        :return:
+            Text to analyze 
+        :param hint: 
+            A list which are hints for the API 
+            in which language the text is written in  
+            example:
+            "de, en"
+        :return: 
+            detected language code
+            example:
+            "en"
         """
         encodedtext = urllib.parse.quote(text)
         # link generation
@@ -100,9 +121,9 @@ class Translator:
             pass
         return d["lang"]
 
-    def translate(self, text:str, lang: str, format:FORMAT = FORMAT.PLAIN_TEXT) -> [str]:
+    def translate(self, text:str, lang: str, format:FORMAT = FORMAT.PLAIN_TEXT):
         """
-        Translate a text
+        Translates a text
         :param text:
             text to translate, the maximum size of the text being passed is 10,000 characters
         :param lang:
@@ -118,7 +139,7 @@ class Translator:
             Possible values:
             FORMAT.PLAIN_TEXT - Text without markup (default value).
             FORMAT.HTML - Text in HTML format.
-        :return:
+        :return: str[]
         """
         encodedtext = urllib.parse.quote(text)
         # link generation
