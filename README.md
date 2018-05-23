@@ -60,7 +60,7 @@ After that create an object in your file you want to translate something.
 ___________
 #
 
-#### Get Languages
+### Get Languages
 ##### Function
 Returns all supported languages
 
@@ -125,7 +125,7 @@ Returns all supported languages
 ___________
 #
 
-#### Detect language
+### Detect language
     
 ##### Function
 Detects a language a text is written in.
@@ -162,7 +162,7 @@ the detected language
 _______           
 #
             
-#### Translate
+### Translate
     
 ##### Function
 Detects a language a text is written in.
