@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 update = "*"
 pip = "*"
+requests = "*"
 
 [dev-packages]
 
