@@ -1,4 +1,6 @@
-# PythonTranslate.py ![PythonVersion](https://img.shields.io/badge/Python-3.6-green.svg)
+# PythonTranslate.py [![Build Status](https://travis-ci.org/Divirad/PythonTranslate.svg?branch=master)](https://travis-ci.org/Divirad/PythonTranslate)
+
+![PythonVersion](https://img.shields.io/badge/Python-3.6-green.svg) 
 
 A wrapper for [translate.Yandex.com](https://translate.Yandex.com)
 
