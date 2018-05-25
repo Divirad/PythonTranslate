@@ -49,10 +49,11 @@ After that create an object in your file you want to translate something.
 
 ##### main.py 
 
-    from pythontranslate import Translator
+    from pythontranslate import *
     from private import APIKEY
     
     translator = Translator(APIKEY) 
 
 ___________
 
+# And [read the fking wiki](https://github.com/Divirad/PythonTranslate/wiki)
