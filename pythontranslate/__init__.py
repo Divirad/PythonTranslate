@@ -5,15 +5,16 @@ from enum import Enum, unique
 
 
 @unique
-class LANG_GET_TYPE(Enum):
-    "represents the types you can get the languages"
+class GETTYPE(Enum):
+    """represents the types you can get the languages"""
     DICT = 0
     ARRAY = 1
     JSON_ALL = 2
 
+
 @unique
 class FORMAT(Enum):
-    "represents the format you want to get the text"
+    """represents the format you want to get the text"""
     PLAIN_TEXT = 0
     HTML = 1
 
@@ -28,15 +29,11 @@ class Translator:
         :param apikey:
             you need an API-key from
             translate.yandex.com/developers
-        :param ui:
-            a language code your usierinterface should be
-            for supported languages go to
-            https://tech.yandex.com/translate/doc/dg/concepts/api-overview-docpage/#languages
         :return: A list of Languages | Dict/Array/JSON
         """
         self.apikey = apikey
 
-    def get_supported_languages(self, arraytype:  LANG_GET_TYPE = LANG_GET_TYPE.JSON_ALL, ui: str = "en"):
+    def get_supported_languages(self, arraytype:  GETTYPE = GETTYPE.JSON_ALL, ui: str = "en"):
         """
         Gets the supported languages
         :param arraytype: 
@@ -57,7 +54,7 @@ class Translator:
                 returns both as JSON-string
         """
         link = "https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=" + self.apikey + \
-            "&ui="+ ui
+            "&ui=" + ui
 
         response = urlopen(link)
         data = response.read().decode("utf-8")
@@ -71,14 +68,14 @@ class Translator:
             print("ERROR: 402, Blocked API Key\n")
             return None
 
-        if arraytype == LANG_GET_TYPE.JSON_ALL:
+        if arraytype == GETTYPE.JSON_ALL:
             return json.loads(data)
-        elif arraytype == LANG_GET_TYPE.ARRAY:
+        elif arraytype == GETTYPE.ARRAY:
             return json.loads(data)["dirs"]
-        elif arraytype == LANG_GET_TYPE.DICT:
+        elif arraytype == GETTYPE.DICT:
             return json.loads(data)["langs"]
 
-    def detect_language(self, text:str, hint:str = None):
+    def detect_language(self, text: str, hint: str = None):
         """
         Detects the language of a text
         :param text:
@@ -121,7 +118,7 @@ class Translator:
             pass
         return d["lang"]
 
-    def translate(self, text:str, lang: str, format:FORMAT = FORMAT.PLAIN_TEXT):
+    def translate(self, text: str, lang: str, form: FORMAT = FORMAT.PLAIN_TEXT):
         """
         Translates a text
         :param text:
@@ -135,7 +132,7 @@ class Translator:
             As the target language code
             (for example, ru).
             In this case, the service tries to detect the source language automatically.
-        :param format:
+        :param form:
             Possible values:
             FORMAT.PLAIN_TEXT - Text without markup (default value).
             FORMAT.HTML - Text in HTML format.
@@ -144,10 +141,9 @@ class Translator:
         encodedtext = urllib.parse.quote(text)
         # link generation
 
-        link = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=" + self.apikey + \
-                "&text=" + encodedtext + \
-                "&lang=" + lang + "&format="
-        if format == FORMAT.PLAIN_TEXT:
+        link = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=" + self.apikey + "&text=" + encodedtext + \
+               "&lang=" + lang + "&format="
+        if form == FORMAT.PLAIN_TEXT:
             link += "plain"
         else:
             link += "html"
