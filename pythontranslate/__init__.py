@@ -1,7 +1,15 @@
-import json
-from urllib.request import urlopen
 import urllib.parse
 from enum import Enum, unique
+
+from requests import get, Response, exceptions
+
+
+class TranslateError(Exception):
+    def __init__(self, message, errorcode):
+        super().__init__("- #" + str(errorcode) + " | " + message)
+        self.message = "- #" + str(errorcode) + " | " + message
+        self.errorcode = errorcode
+    pass
 
 
 @unique
@@ -33,47 +41,20 @@ class Translator:
         """
         self.apikey = apikey
 
-    def get_supported_languages(self, arraytype:  GETTYPE = GETTYPE.JSON_ALL, ui: str = "en"):
-        """
-        Gets the supported languages
-        :param arraytype: 
-            Describes which data will be returned
-        :param ui: 
-            In the response, supported languages are listed in the 
-            langs field with the definitions of the language codes. 
-            Language names are output in the language corresponding 
-            to the code in this parameter.
-            All the language codes are shown in the list of 
-            supported languages.
-        :return:
-            if LANG_GET_TYPE.DICT:
-                returns supported languages as dictionary
-            elif LANG_GET_TYPE.ARRAY:
-                returns supported from-to translations as dictionary
-            elif LANG_GET_TYPE.JSON_ALL:
-                returns both as JSON-string
-        """
-        link = "https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=" + self.apikey + \
-            "&ui=" + ui
+    def get_lang_array(self):
+        """gets supported langs as an array"""
 
-        response = urlopen(link)
-        data = response.read().decode("utf-8")
+        r = self.yandex_translate_request("getLangs", "")
+        self.handle_errors(r)
 
-        # TODO impelemt exceptions/Errors
+        return r.json()["dirs"]
 
-        if data == "401":
-            print("ERROR: 401, Invalid API Key\n")
-            return None
-        elif data == "402":
-            print("ERROR: 402, Blocked API Key\n")
-            return None
+    def get_lang_dict(self):
+        """gets supported langs as an dictionary"""
+        r = self.yandex_translate_request("getLangs")
+        self.handle_errors(r)
 
-        if arraytype == GETTYPE.JSON_ALL:
-            return json.loads(data)
-        elif arraytype == GETTYPE.ARRAY:
-            return json.loads(data)["dirs"]
-        elif arraytype == GETTYPE.DICT:
-            return json.loads(data)["langs"]
+        return r.json()["langs"]
 
     def detect_language(self, text: str, hint: str = None):
         """
@@ -86,37 +67,17 @@ class Translator:
             example:
             "de, en"
         :return: 
-            detected language code
-            example:
-            "en"
+            detected language code. example: "en"
         """
         encodedtext = urllib.parse.quote(text)
-        # link generation
 
-        link = "https://translate.yandex.net/api/v1.5/tr.json/detect?key=" + self.apikey + \
-               "&text=" + encodedtext
+        args = "&text=" + encodedtext
         if hint is not None:
-            link += "&hint=" + hint
+            args += "&hint=" + hint
 
-        response = urlopen(link)
-        data = response.read().decode("utf-8")
-        d = json.loads(data)
-
-        # TODO handle exceptions/Errors
-        # 200 Operation completed successfully
-        # 401 Invalid API key
-        # 402 Blocked API key
-        # 404 Exceeded the daily limit on the amount of translated text
-
-        if d["code"] == 200:
-            pass
-        elif d["code"] == 401:
-            pass
-        elif d["code"] == 402:
-            pass
-        elif d["code"] == 404:
-            pass
-        return d["lang"]
+        r = self.yandex_translate_request("detect", args)
+        self.handle_errors(r)
+        return r.json()["lang"]
 
     def translate(self, text: str, lang: str, form: FORMAT = FORMAT.PLAIN_TEXT):
         """
@@ -124,31 +85,43 @@ class Translator:
         :param text:
             text to translate, the maximum size of the text being passed is 10,000 characters
         :param lang:
-            The translation direction.
-            You can set it in either of the following ways:
-            As a pair of language codes separated by a hyphen
-            (“from”-“to”).
-            For example, en-ru indicates translating from English to Russian.
-            As the target language code
-            (for example, ru).
-            In this case, the service tries to detect the source language automatically.
+            The translation direction. for example: "en-ru"
+            or target lang. for example, "ru"
         :param form:
             Possible values:
-            FORMAT.PLAIN_TEXT - Text without markup (default value).
-            FORMAT.HTML - Text in HTML format.
+                FORMAT.PLAIN_TEXT - Text without markup (default value).
+                FORMAT.HTML - Text in HTML format.
         :return: str[]
         """
         encodedtext = urllib.parse.quote(text)
-        # link generation
-
-        link = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=" + self.apikey + "&text=" + encodedtext + \
-               "&lang=" + lang + "&format="
+        args = "&text=" + encodedtext + "&lang=" + lang + "&format="
         if form == FORMAT.PLAIN_TEXT:
-            link += "plain"
+            args += "plain"
         else:
-            link += "html"
+            args += "html"
 
-        response = urlopen(link)
-        data = response.read().decode("utf-8")
-        d = json.loads(data)
-        return d["text"]
+        r = self.yandex_translate_request("translate", args)
+        self.handle_errors(r)
+
+        return r.json()["text"]
+
+    def yandex_translate_request(self, func: str, args: str = "") -> Response:
+        link = "https://translate.yandex.net/api/v1.5/tr.json/"
+        link += func + "?key=" + self.apikey
+        link += args
+        try:
+            r = get(link)
+        except exceptions.ConnectionError as e:
+            raise TranslateError("Connection Error. Can’t connect to the server.", 100)
+        return r
+
+    @staticmethod
+    def handle_errors(response: Response):
+        if response.status_code == 401:
+            raise TranslateError("Invalid API key", 401)
+        elif response.status_code == 402:
+            raise TranslateError("Blocked API key", 402)
+        elif response.status_code == 403:
+            raise TranslateError("Forbidden. Invalid API key", 403)
+        elif response.status_code == 404:
+            raise TranslateError("Exceeded the daily limit on the amount of translated text", 404)
