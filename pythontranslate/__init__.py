@@ -28,9 +28,7 @@ class FORMAT(Enum):
 
 
 class Translator:
-    """
-    Translate your stuff free and online with Yandex
-    """
+    """Translate your stuff free and online with translate.yandex.com"""
     def __init__(self, apikey: str):
         """
         Initializes the translate object. btw: Never upload your API-keys!
