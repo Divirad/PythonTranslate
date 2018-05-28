@@ -26,8 +26,7 @@ Wrapper by Divirad(c)
     Requirements for font size
     The font size of this text must not be smaller than the font size of the main text.
     
-## Installation
-   ![PythonVersion](https://img.shields.io/badge/WARING-Not%20supported%20yet!-darkred.svg) 
+## Installation 
    
     pipenv install pythontranslate
 
