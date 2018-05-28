@@ -7,6 +7,7 @@ name = "pypi"
 update = "*"
 pip = "*"
 requests = "*"
+pythontranslate = "*"
 
 [dev-packages]
 
