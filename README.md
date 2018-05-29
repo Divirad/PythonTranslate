@@ -53,4 +53,4 @@ After that create an object in your file you want to translate something.
 
 ___________
 
-# And [read the fking wiki](https://github.com/Divirad/PythonTranslate/wiki)
+[For more information visit the wiki <3](https://github.com/Divirad/PythonTranslate/wiki)
