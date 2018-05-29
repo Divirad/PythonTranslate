@@ -13,14 +13,6 @@ class TranslateError(Exception):
 
 
 @unique
-class GETTYPE(Enum):
-    """represents the types you can get the languages"""
-    DICT = 0
-    ARRAY = 1
-    JSON_ALL = 2
-
-
-@unique
 class FORMAT(Enum):
     """represents the format you want to get the text"""
     PLAIN_TEXT = 0
