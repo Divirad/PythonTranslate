@@ -25,15 +25,13 @@ Wrapper by Divirad(c)
 
     Requirements for font size
     The font size of this text must not be smaller than the font size of the main text.
-    
-## Installation 
-   
-    pipenv install pythontranslate
 
 ## How to use it? 
 First you have to get an Api-Key from this Site 
 
 [Get API Key](https://translate.yandex.com/developers/keys)
+
+install it with `pipenv install pythontranslate`
 
 Keep in mind that it's not safe to upload your API-Key publicly on Github.
 We recommend you to save it in an private.py file to import it localy into your project.
